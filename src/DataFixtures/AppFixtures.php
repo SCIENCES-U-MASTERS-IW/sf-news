@@ -2,10 +2,12 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use App\Entity\Article;
 use App\Entity\Category;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
@@ -13,7 +15,8 @@ class AppFixtures extends Fixture
     private const NB_ARTICLES = 200;
 
     public function __construct(
-        private string $locale
+        private string $locale,
+        private UserPasswordHasherInterface $hasher
     ) {
     }
 
@@ -41,6 +44,22 @@ class AppFixtures extends Fixture
 
             $manager->persist($article);
         }
+
+        $regularUser = new User();
+        $regularUser
+            ->setEmail("regular@email.com")
+            ->setPassword($this->hasher->hashPassword($regularUser, "regular"));
+
+        $manager->persist($regularUser);
+
+        $adminUser = new User();
+        $adminUser
+            ->setEmail("admin@email.com")
+            ->setRoles(["ROLE_ADMIN"])
+            ->setPassword($this->hasher->hashPassword($adminUser, "admin"));
+
+        $manager->persist($adminUser);
+
         $manager->flush();
     }
 }
