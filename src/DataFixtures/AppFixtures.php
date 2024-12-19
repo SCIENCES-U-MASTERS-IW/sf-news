@@ -12,9 +12,14 @@ class AppFixtures extends Fixture
     private const NB_CATEGORIES = 30;
     private const NB_ARTICLES = 200;
 
+    public function __construct(
+        private string $locale
+    ) {
+    }
+
     public function load(ObjectManager $manager): void
     {
-        $faker = \Faker\Factory::create("zh_TW");
+        $faker = \Faker\Factory::create($this->locale);
         $categories = [];
 
         for ($i = 0; $i < self::NB_CATEGORIES; $i++) {
